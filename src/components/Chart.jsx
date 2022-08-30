@@ -13,16 +13,22 @@ import {
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.defaults.font.size = 16;
 
-const Chart = ({ indicador, valoresIndicador, year }) => {
-	const labels = valoresIndicador.map((indicador) => indicador.fecha.substring(5, 10));
+const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
+	valoresIndicador = valoresIndicador.slice(`-${cantidadDatos}`);
+	const labels = valoresIndicador.map((ind) => ind.fecha.substring(5, 10));
 
 	const data = {
 		labels,
 		datasets: [
 			{
-				label: indicador,
-				data: valoresIndicador.map((indicador) => indicador.valor),
+				label: `Indicadores ${
+					indicador === 'libra_cobre' || indicador === 'tasa_desempleo' ? 'de la' : 'del'
+				} ${indicador}, últimos ${
+					valoresIndicador.length
+				} datos adquiridos durante el ${year}`,
+				data: valoresIndicador.map((ind) => ind.valor),
 				borderColor: 'rgb(255, 99, 132)',
 				backgroundColor: 'rgba(255, 99, 132, 0.5)',
 			},
@@ -59,7 +65,7 @@ const Chart = ({ indicador, valoresIndicador, year }) => {
 			},
 			title: {
 				display: true,
-				text: `Gráfico indicadores - últimos ${valoresIndicador.length} datos adquiridos del ${year}`,
+				text: '',
 				font: {
 					size: '20px',
 				},

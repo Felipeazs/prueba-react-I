@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function Selector({ indicador, selectores, indicadorHandler }) {
+export default function Selector({ indicador, selectores, indicadorHandler, label }) {
 	const listaIndicadores = selectores.map((selector, i) => {
 		return (
 			<MenuItem
@@ -19,12 +19,12 @@ export default function Selector({ indicador, selectores, indicadorHandler }) {
 	return (
 		<Box sx={{ minWidth: 220 }}>
 			<FormControl fullWidth>
-				<InputLabel id='demo-simple-select-label'>Indicador</InputLabel>
+				<InputLabel id='demo-simple-select-label'>{label}</InputLabel>
 				<Select
 					labelId='demo-simple-select-label'
 					id='demo-simple-select'
 					value={indicador}
-					label='Indicador'
+					label={label}
 					onChange={indicadorHandler}
 				>
 					{listaIndicadores}
