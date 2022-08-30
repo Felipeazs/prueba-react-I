@@ -17,18 +17,14 @@ const MyApi = () => {
 
 			setLoading(false);
 			setValores(arr);
-
-			console.log(arr);
 		};
 
 		fetchDatosIndicador();
-	});
+	}, []);
 
-	const listaValores = valores.map((valor) => <li>{valor.valor}</li>);
 	return (
 		<div>
-			<ul>{listaValores}</ul>
-			<Chart />
+			<Chart indicadores={valores} />
 		</div>
 	);
 };
