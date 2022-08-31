@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { etiqueta } from '../utils/functions';
+
 import {
 	Chart as ChartJS,
 	CategoryScale,
@@ -17,17 +19,14 @@ ChartJS.defaults.font.size = 16;
 
 const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
 	valoresIndicador = valoresIndicador.slice(`-${cantidadDatos}`);
+
 	const labels = valoresIndicador.map((ind) => ind.fecha.substring(5, 10));
 
 	const data = {
 		labels,
 		datasets: [
 			{
-				label: `Indicadores ${
-					indicador === 'libra_cobre' || indicador === 'tasa_desempleo' ? 'de la' : 'del'
-				} ${indicador}, últimos ${
-					valoresIndicador.length
-				} datos adquiridos durante el ${year}`,
+				label: indicador,
 				data: valoresIndicador.map((ind) => ind.valor),
 				borderColor: 'rgb(255, 99, 132)',
 				backgroundColor: 'rgba(255, 99, 132, 0.5)',
@@ -41,7 +40,7 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
 			y: {
 				title: {
 					display: true,
-					text: 'Valor ($ CLP)',
+					text: `Valor (${etiqueta(indicador)})`,
 					font: {
 						size: '15px',
 						weight: '700',
@@ -65,7 +64,11 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
 			},
 			title: {
 				display: true,
-				text: '',
+				text: `Indicadores ${
+					indicador === 'libra_cobre' || indicador === 'tasa_desempleo' ? 'de la' : 'del'
+				} ${indicador} - últimos ${
+					valoresIndicador.length
+				} datos adquiridos durante el ${year}`,
 				font: {
 					size: '20px',
 				},

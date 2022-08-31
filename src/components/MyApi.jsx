@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
+//Chart.JS
 import Chart from './Chart';
+
+//Componentes
 import BasicModal from './BasicModal';
 import Selector from './Selector';
 import Input from './Input';
+
+//MUI
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import TextField from '@mui/material/TextField';
@@ -13,6 +18,9 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+
+//funciones
+import { formato, seleccionYears } from '../utils/functions';
 
 const baseUrl = 'https://mindicador.cl/api';
 
@@ -26,9 +34,9 @@ const MyApi = () => {
 	const [cantidadDatos, setCantidadDatos] = useState(10);
 	const [years, setYears] = useState(year);
 	const [fecha, setFecha] = useState(today);
-	const [alignment, setAlignment] = useState('year');
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(false);
+	const [toggle, setToggle] = useState('year'); // Selección año / fecha
+	const [loading, setLoading] = useState(true); // Manejo del modal y progress bar
+	const [error, setError] = useState(false); // Errores del servidor
 
 	//Obtener todos los datos de la api para generar la selección dinámica de indicadores
 	useEffect(() => {
@@ -63,17 +71,17 @@ const MyApi = () => {
 		fetchTodosLosDatos();
 	}, []);
 
-	//Obtener valores según el indicador del presente año
+	//Obtener valores según el indicador del presente año o según fecha exacta
 	useEffect(() => {
 		const fetchDatosIndicador = async () => {
 			setLoading(true);
 
 			try {
 				let url;
-				if (alignment === 'year') {
+				if (toggle === 'year') {
 					url = `${baseUrl}/${indicador}/${years}`;
 				} else {
-					url = `${baseUrl}/${indicador}/${format(fecha)}`;
+					url = `${baseUrl}/${indicador}/${formato(fecha)}`;
 				}
 
 				const response = await fetch(url);
@@ -81,23 +89,23 @@ const MyApi = () => {
 				if (!response.ok || !response) {
 					throw new Error('No pudimos conectarnos con el servidor');
 				}
-				const data = await response.json();
+				const { serie } = await response.json();
 
-				if (alignment === 'year') {
-					setValoresIndicador(data.serie.reverse());
+				if (toggle === 'year') {
+					setValoresIndicador(serie.reverse());
 				} else {
-					setValoresIndicador(data.serie);
+					setValoresIndicador(serie);
 				}
 
 				setLoading(false);
 			} catch (error) {
-				setLoading(false);
 				setError(true);
+				setLoading(false);
 			}
 		};
 
 		fetchDatosIndicador();
-	}, [indicador, years, alignment, fecha]);
+	}, [indicador, years, toggle, fecha]);
 
 	const indicadorHandler = (event) => {
 		setIndicador(event.target.value);
@@ -110,8 +118,8 @@ const MyApi = () => {
 		setCantidadDatos(event.target.value);
 	};
 
-	const toggleHandler = (event, newAlignment) => {
-		setAlignment(newAlignment);
+	const toggleHandler = (event, newToggle) => {
+		setToggle(newToggle);
 	};
 
 	const dateHandler = (event) => {
@@ -123,7 +131,7 @@ const MyApi = () => {
 			<BasicModal
 				mensaje='Cargando datos del indicador...'
 				subtitulo='Esto puede tardar un par de minutos'
-				display={true}
+				display={true} // display del progress bar
 			/>
 		);
 	}
@@ -138,19 +146,13 @@ const MyApi = () => {
 		);
 	}
 
-	let min = year - 11;
-	const listaYears = [];
-	for (let i = year; i >= min; i--) {
-		listaYears.push(+i);
-	}
-
 	if (!loading && !error) {
 		return (
 			<div className='horizontal'>
 				<div className='vertical'>
 					<ToggleButtonGroup
 						color='primary'
-						value={alignment}
+						value={toggle}
 						exclusive
 						onChange={toggleHandler}
 						aria-label='Platform'
@@ -158,10 +160,10 @@ const MyApi = () => {
 						<ToggleButton value='year'>Año</ToggleButton>
 						<ToggleButton value='fecha'>Fecha</ToggleButton>
 					</ToggleButtonGroup>
-					{alignment === 'year' && (
+					{toggle === 'year' && (
 						<>
 							<Selector
-								selectores={listaYears}
+								selectores={seleccionYears(year, 10)}
 								indicadorHandler={yearsHandler}
 								indicador={years}
 								label='Año'
@@ -179,7 +181,7 @@ const MyApi = () => {
 							/>
 						</>
 					)}
-					{alignment === 'fecha' && (
+					{toggle === 'fecha' && (
 						<>
 							<LocalizationProvider dateAdapter={AdapterMoment}>
 								<DesktopDatePicker
@@ -200,7 +202,7 @@ const MyApi = () => {
 					)}
 				</div>
 				<div className='chart'>
-					{alignment === 'year' && (
+					{toggle === 'year' && (
 						<Chart
 							year={years}
 							indicador={indicador}
@@ -208,7 +210,7 @@ const MyApi = () => {
 							cantidadDatos={cantidadDatos}
 						/>
 					)}
-					{alignment === 'fecha' && (
+					{toggle === 'fecha' && (
 						<Card sx={{ minWidth: 275, m: 25 }}>
 							<CardContent>
 								<Typography
@@ -216,7 +218,7 @@ const MyApi = () => {
 									color='text.secondary'
 									gutterBottom
 								>
-									Valores {indicador} {format(fecha)}
+									Valor del {indicador} al {formato(fecha)}
 								</Typography>
 								<Typography
 									variant='h5'
@@ -234,19 +236,5 @@ const MyApi = () => {
 		);
 	}
 };
-
-function format(inputDate) {
-	let date, month, year;
-
-	date = inputDate.getDate();
-	month = inputDate.getMonth() + 1;
-	year = inputDate.getFullYear();
-
-	date = date.toString().padStart(2, '0');
-
-	month = month.toString().padStart(2, '0');
-
-	return `${date}-${month}-${year}`;
-}
 
 export default MyApi;
