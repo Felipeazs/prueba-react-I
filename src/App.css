@@ -1,27 +1,28 @@
 .home {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: space-between;
-  height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    height: 100vh;
+    background-color: #f1f7ee;
 }
 
 .horizontal {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
 }
 .vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 .chart {
-  width: 1000px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 1000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

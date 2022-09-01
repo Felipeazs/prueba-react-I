@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { etiqueta } from '../utils/functions'
-
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -20,7 +18,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 ChartJS.register(chartTrendline)
 ChartJS.defaults.font.size = 16
 
-const Chart = ({ valoresIndicador, cantidadDatos, year }) => {
+const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
     valoresIndicador = valoresIndicador.slice(`-${cantidadDatos}`)
 
     const series = valoresIndicador.map(valor => valor.serie)
@@ -28,7 +26,7 @@ const Chart = ({ valoresIndicador, cantidadDatos, year }) => {
     const labels = valoresIndicador.map(valor => valor.fecha.substring(5, 10))
 
     let trendline = {
-        colorMin: 'red',
+        colorMin: 'rgb(226, 149, 120)',
         colorMax: 'green',
         lineStyle: 'dotted',
         width: 2,
@@ -43,10 +41,10 @@ const Chart = ({ valoresIndicador, cantidadDatos, year }) => {
         labels,
         datasets: [
             {
-                label: '',
+                label: indicador,
                 data: series,
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgb(244, 211, 94)',
+                backgroundColor: 'rgba(238, 150, 75, 0.5)',
                 trendlineLinear: trendline,
             },
         ],
@@ -58,7 +56,7 @@ const Chart = ({ valoresIndicador, cantidadDatos, year }) => {
             y: {
                 title: {
                     display: true,
-                    text: `Valor (${etiqueta('')})`,
+                    text: `Valor ($ USD)`,
                     font: {
                         size: '15px',
                         weight: '700',

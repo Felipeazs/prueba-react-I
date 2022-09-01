@@ -8,34 +8,20 @@ import BasicModal from './BasicModal'
 import Selector from './Selector'
 import Input from './Input'
 
-//MUI
-import ToggleButton from '@mui/material/ToggleButton'
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-import TextField from '@mui/material/TextField'
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-
 //funciones
-import { formato, seleccionYears, seleccionIntervalo } from '../utils/functions'
+import { seleccionYears, seleccionIntervalo } from '../utils/functions'
 
 const baseUrl = 'https://api.coincap.io/v2/assets'
 
 const MyApi = () => {
     const year = new Date().getFullYear()
-    const today = new Date()
 
     const [indicador, setIndicador] = useState('bitcoin')
     const [valoresIndicador, setValoresIndicador] = useState([])
     const [seleccionadores, setSeleccionadores] = useState([])
-    const [cantidadDatos, setCantidadDatos] = useState(10)
+    const [cantidadDatos, setCantidadDatos] = useState(0)
     const [years, setYears] = useState(year)
-    const [fecha, setFecha] = useState(today)
     const [intervalo, setIntervalo] = useState('d1')
-    const [toggle, setToggle] = useState('year') // Selección año / fecha
     const [loading, setLoading] = useState(true) // Manejo del modal y progress bar
     const [error, setError] = useState(false) // Errores del servidor
 
@@ -77,12 +63,12 @@ const MyApi = () => {
     useEffect(() => {
         const fetchDatosIndicador = async () => {
             setLoading(true)
-            let mill = Math.floor(new Date(years.toString()).getTime())
+            let from = Math.floor(new Date(years.toString()).getTime())
             let now = Math.floor(new Date(new Date()).getTime())
             try {
                 let url
-                if (toggle === 'year' && intervalo === 'd1') {
-                    url = `https://api.coincap.io/v2/assets/${indicador}/history?interval=${intervalo}&start=${mill}&end=${now}`
+                if (intervalo === 'd1') {
+                    url = `https://api.coincap.io/v2/assets/${indicador}/history?interval=${intervalo}&start=${from}&end=${now}`
                 } else {
                     url = `https://api.coincap.io/v2/assets/${indicador}/history?interval=${intervalo}`
                 }
@@ -95,17 +81,15 @@ const MyApi = () => {
                 const { data } = await response.json()
 
                 let valorIndicador = []
-                if (toggle === 'year') {
-                    data.forEach(d =>
-                        valorIndicador.push({
-                            serie: d.priceUsd,
-                            fecha: d.date,
-                        })
-                    )
-                    setValoresIndicador(valorIndicador)
-                } else {
-                    setValoresIndicador({})
-                }
+
+                data.forEach(d =>
+                    valorIndicador.push({
+                        serie: d.priceUsd,
+                        fecha: d.date,
+                    })
+                )
+                setValoresIndicador(valorIndicador)
+                setCantidadDatos(valorIndicador.length)
 
                 setLoading(false)
             } catch (error) {
@@ -115,11 +99,7 @@ const MyApi = () => {
         }
 
         fetchDatosIndicador()
-    }, [indicador, years, toggle, fecha, intervalo])
-
-    const cantidadHandler = event => {
-        setCantidadDatos(event.target.value)
-    }
+    }, [indicador, years, intervalo])
 
     const intervaloHandler = event => {
         setIntervalo(event.target.value)
@@ -149,7 +129,6 @@ const MyApi = () => {
     }
 
     if (!loading && !error) {
-        console.log(intervalo)
         return (
             <div className="horizontal">
                 <div className="vertical">
@@ -161,9 +140,12 @@ const MyApi = () => {
                     />
                     <Selector
                         selectores={seleccionYears(year, 10)}
-                        indicadorHandler={event => setYears(event.target.value)}
+                        indicadorHandler={event => {
+                            setYears(event.target.value)
+                            setCantidadDatos(prevState => prevState)
+                        }}
                         indicador={years}
-                        label="Año"
+                        label={`Año (desde - ${year})`}
                         disabled={intervalo === 'd1' ? false : true}
                     />
                     <Selector
@@ -173,7 +155,7 @@ const MyApi = () => {
                         label="Intervalo"
                     />
                     <Input
-                        cantidadHandler={cantidadHandler}
+                        cantidadHandler={event => setCantidadDatos(event.target.value)}
                         cantidadDatos={cantidadDatos}
                         maxDatos={valoresIndicador.length}
                     />

@@ -5,7 +5,6 @@ import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
 
 export default function Selector({ indicador, selectores, indicadorHandler, label, disabled }) {
-    console.log(disabled)
     const listaIndicadores = selectores.map((selector, i) => {
         return (
             <MenuItem

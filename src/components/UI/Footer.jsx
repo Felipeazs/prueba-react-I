@@ -11,7 +11,7 @@ const Footer = () => {
                     href="https://mindicador.cl"
                     target="_blank"
                     rel="noreferrer">
-                    mindicador.cl
+                    api.coincap.io
                 </a>
             </p>
         </div>
