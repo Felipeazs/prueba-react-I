@@ -11,17 +11,21 @@ import Input from './Input'
 //funciones
 import { seleccionYears, seleccionIntervalo } from '../utils/functions'
 
+//MUI
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+
 const baseUrl = 'https://api.coincap.io/v2/assets'
 
 const MyApi = () => {
     const year = new Date().getFullYear()
 
-    const [indicador, setIndicador] = useState('bitcoin')
+    const [indicador, setIndicador] = useState({ nombre: 'Bitcoin', value: 'bitcoin' })
     const [valoresIndicador, setValoresIndicador] = useState([])
     const [seleccionadores, setSeleccionadores] = useState([])
     const [cantidadDatos, setCantidadDatos] = useState(0)
-    const [years, setYears] = useState(year)
-    const [intervalo, setIntervalo] = useState('d1')
+    const [years, setYears] = useState({ value: year })
+    const [intervalo, setIntervalo] = useState({ nombre: 'Dia', value: 'd1' })
     const [loading, setLoading] = useState(true) // Manejo del modal y progress bar
     const [error, setError] = useState(false) // Errores del servidor
 
@@ -63,14 +67,14 @@ const MyApi = () => {
     useEffect(() => {
         const fetchDatosIndicador = async () => {
             setLoading(true)
-            let from = Math.floor(new Date(years.toString()).getTime())
+            let from = Math.floor(new Date(years.value.toString()).getTime())
             let now = Math.floor(new Date(new Date()).getTime())
             try {
                 let url
-                if (intervalo === 'd1') {
-                    url = `https://api.coincap.io/v2/assets/${indicador}/history?interval=${intervalo}&start=${from}&end=${now}`
+                if (intervalo.value === 'd1') {
+                    url = `https://api.coincap.io/v2/assets/${indicador.value}/history?interval=${intervalo.value}&start=${from}&end=${now}`
                 } else {
-                    url = `https://api.coincap.io/v2/assets/${indicador}/history?interval=${intervalo}`
+                    url = `https://api.coincap.io/v2/assets/${indicador.value}/history?interval=${intervalo.value}`
                 }
 
                 const response = await fetch(url)
@@ -102,9 +106,9 @@ const MyApi = () => {
     }, [indicador, years, intervalo])
 
     const intervaloHandler = event => {
-        setIntervalo(event.target.value)
+        setIntervalo({ nombre: event.target.name, value: event.target.value })
         if (event.target.value !== 'd1') {
-            setYears(2022)
+            setYears({ value: new Date().getFullYear() })
         }
     }
 
@@ -132,40 +136,63 @@ const MyApi = () => {
         return (
             <div className="horizontal">
                 <div className="vertical">
-                    <Selector
-                        selectores={seleccionadores}
-                        indicadorHandler={event => setIndicador(event.target.value)}
-                        indicador={indicador}
-                        label="Indicador"
-                    />
-                    <Selector
-                        selectores={seleccionYears(year, 10)}
-                        indicadorHandler={event => {
-                            setYears(event.target.value)
-                            setCantidadDatos(prevState => prevState)
-                        }}
-                        indicador={years}
-                        label={`Año (desde - ${year})`}
-                        disabled={intervalo === 'd1' ? false : true}
-                    />
-                    <Selector
-                        selectores={seleccionIntervalo()}
-                        indicadorHandler={intervaloHandler}
-                        indicador={intervalo}
-                        label="Intervalo"
-                    />
-                    <Input
-                        cantidadHandler={event => setCantidadDatos(event.target.value)}
-                        cantidadDatos={cantidadDatos}
-                        maxDatos={valoresIndicador.length}
-                    />
+                    <Card sx={{ minWidth: 275 }}>
+                        <CardContent>
+                            <Selector
+                                selectores={seleccionadores}
+                                indicadorHandler={event =>
+                                    setIndicador({
+                                        value: event.target.value,
+                                        nombre: event.target.name,
+                                    })
+                                }
+                                indicador={indicador}
+                                label="Indicador"
+                            />
+                        </CardContent>
+                    </Card>
+                    <Card sx={{ minWidth: 275 }}>
+                        <CardContent>
+                            <Selector
+                                selectores={seleccionYears(year, 10)}
+                                indicadorHandler={event => {
+                                    setYears({ value: event.target.value })
+                                    setCantidadDatos(prevState => prevState)
+                                }}
+                                indicador={years}
+                                label={`Año (desde - ${year})`}
+                                disabled={intervalo.value === 'd1' ? false : true}
+                            />
+                        </CardContent>
+                    </Card>
+                    <Card sx={{ minWidth: 275 }}>
+                        <CardContent>
+                            <Selector
+                                selectores={seleccionIntervalo()}
+                                indicadorHandler={intervaloHandler}
+                                indicador={intervalo}
+                                label="Intervalo"
+                            />
+                        </CardContent>
+                    </Card>
+                    <Card sx={{ minWidth: 275 }}>
+                        <CardContent>
+                            <Input
+                                cantidadHandler={event => setCantidadDatos(event.target.value)}
+                                cantidadDatos={cantidadDatos}
+                                maxDatos={valoresIndicador.length}
+                            />
+                        </CardContent>
+                    </Card>
                 </div>
+
                 <div className="chart">
                     <Chart
                         year={years}
                         indicador={indicador}
                         valoresIndicador={valoresIndicador}
                         cantidadDatos={cantidadDatos}
+                        intervalo={intervalo}
                     />
                 </div>
             </div>

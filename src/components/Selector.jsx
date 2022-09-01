@@ -9,6 +9,7 @@ export default function Selector({ indicador, selectores, indicadorHandler, labe
         return (
             <MenuItem
                 key={i}
+                name={selector.nombre}
                 value={selector.value}>
                 {selector.nombre}
             </MenuItem>
@@ -22,7 +23,8 @@ export default function Selector({ indicador, selectores, indicadorHandler, labe
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={indicador}
+                    value={indicador.value}
+                    name={indicador.nombre}
                     label={label}
                     onChange={indicadorHandler}
                     disabled={disabled}>

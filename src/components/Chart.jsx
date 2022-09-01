@@ -1,5 +1,9 @@
 import React from 'react'
 
+//MUI
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -18,7 +22,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 ChartJS.register(chartTrendline)
 ChartJS.defaults.font.size = 16
 
-const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
+const Chart = ({ indicador, valoresIndicador, cantidadDatos, year, intervalo }) => {
     valoresIndicador = valoresIndicador.slice(`-${cantidadDatos}`)
 
     const series = valoresIndicador.map(valor => valor.serie)
@@ -26,7 +30,7 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
     const labels = valoresIndicador.map(valor => valor.fecha.substring(5, 10))
 
     let trendline = {
-        colorMin: 'rgb(226, 149, 120)',
+        colorMin: 'rgb(71, 40, 54)',
         colorMax: 'green',
         lineStyle: 'dotted',
         width: 2,
@@ -41,7 +45,7 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
         labels,
         datasets: [
             {
-                label: indicador,
+                label: indicador.nombre,
                 data: series,
                 borderColor: 'rgb(244, 211, 94)',
                 backgroundColor: 'rgba(238, 150, 75, 0.5)',
@@ -78,23 +82,25 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year }) => {
             legend: {
                 position: 'top',
             },
-            // title: {
-            //     display: true,
-            //     text: `Indicadores ${
-            //         ' === 'libra_cobre' || codigo === 'tasa_desempleo' ? 'de la' : 'del'
-            //     } ${nombre} - últimos ${cantidadDatos} datos adquiridos durante el ${year}`,
-            //     font: {
-            //         size: '20px',
-            //     },
-            // },
+            title: {
+                display: true,
+                text: `Indicadores del ${indicador.nombre} `,
+                font: {
+                    size: '20px',
+                },
+            },
         },
     }
 
     return (
-        <Line
-            options={options}
-            data={data}
-        />
+        <Card sx={{ width: 1000 }}>
+            <CardContent>
+                <Line
+                    options={options}
+                    data={data}
+                />
+            </CardContent>
+        </Card>
     )
 }
 
