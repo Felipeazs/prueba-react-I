@@ -1,5 +1,13 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  height: 100vh;
+}
+
 .horizontal {
-  margin-top: 50px;
+  margin-top: 30px;
   display: flex;
   flex-direction: row;
   justify-content: center;
