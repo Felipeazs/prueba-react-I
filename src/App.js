@@ -7,7 +7,7 @@ function App() {
     return (
         <div className="home">
             <Navbar />
-            
+            <h2>INDICADORES ECONÓMICOS</h2>
             <MyApi />
             <Footer />
         </div>

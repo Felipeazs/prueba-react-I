@@ -11,23 +11,35 @@ import {
     PointElement,
     LineElement,
     Title,
+    SubTitle,
     Tooltip,
     Legend,
+    Filler,
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 
 import chartTrendline from 'chartjs-plugin-trendline'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    SubTitle,
+    Tooltip,
+    Legend,
+    Filler
+)
 ChartJS.register(chartTrendline)
-ChartJS.defaults.font.size = 16
+ChartJS.defaults.font.family = 'Source Sans Pro'
 
-const Chart = ({ indicador, valoresIndicador, cantidadDatos, year, intervalo }) => {
+const Chart = ({ indicador, valoresIndicador, cantidadDatos, intervalo }) => {
     valoresIndicador = valoresIndicador.slice(`-${cantidadDatos}`)
 
     const series = valoresIndicador.map(valor => valor.serie)
 
-    const labels = valoresIndicador.map(valor => valor.fecha.substring(5, 10))
+    const labels = valoresIndicador.map(valor => valor.fecha.substring(0, 10))
 
     let trendline = {
         colorMin: 'rgb(71, 40, 54)',
@@ -45,11 +57,13 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year, intervalo }) 
         labels,
         datasets: [
             {
-                label: indicador.nombre,
+                type: 'line',
+                label: indicador,
                 data: series,
-                borderColor: 'rgb(244, 211, 94)',
-                backgroundColor: 'rgba(238, 150, 75, 0.5)',
+                borderColor: 'rgb(44, 44, 52)',
+                backgroundColor: 'rgba(8, 146, 165, 0.8)',
                 trendlineLinear: trendline,
+                fill: true,
             },
         ],
     }
@@ -66,6 +80,9 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year, intervalo }) 
                         weight: '700',
                     },
                 },
+                grid: {
+                    display: false,
+                },
             },
             x: {
                 title: {
@@ -76,19 +93,35 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year, intervalo }) 
                         weight: '700',
                     },
                 },
+                ticks: {
+                    maxTicksLimit: 15,
+                },
+                grid: {
+                    display: false,
+                },
             },
         },
         plugins: {
             legend: {
+                display: false,
                 position: 'top',
             },
             title: {
                 display: true,
-                text: `Indicadores del ${indicador.nombre} `,
+                text: `${indicador} ${intervalo === 'd1' ? '(anual)' : '(30 días)'}`,
                 font: {
-                    size: '20px',
+                    size: '18px',
                 },
+                padding: { top: 20, bottom: 50 },
             },
+            subtitle: {
+                display: false,
+            },
+        },
+        interaction: {
+            intersect: false,
+            axis: 'x',
+            mode: 'nearest',
         },
     }
 
@@ -96,6 +129,7 @@ const Chart = ({ indicador, valoresIndicador, cantidadDatos, year, intervalo }) 
         <Card sx={{ width: 1000 }}>
             <CardContent>
                 <Line
+                    className="lineChart"
                     options={options}
                     data={data}
                 />

@@ -8,10 +8,9 @@ export default function Selector({ indicador, selectores, indicadorHandler, labe
     const listaIndicadores = selectores.map((selector, i) => {
         return (
             <MenuItem
-                key={i}
-                name={selector.nombre}
+                key={selector.value}
                 value={selector.value}>
-                {selector.nombre}
+                {selector.name}
             </MenuItem>
         )
     })
@@ -23,8 +22,7 @@ export default function Selector({ indicador, selectores, indicadorHandler, labe
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={indicador.value}
-                    name={indicador.nombre}
+                    value={indicador}
                     label={label}
                     onChange={indicadorHandler}
                     disabled={disabled}>
